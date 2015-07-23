@@ -9,6 +9,20 @@ Setup
 
 1. <code>sqlite3 quick\_annotations.db < db\_setup\_quick\_annotations.sql</code>
 2. Load text documents into database using your own method.
+3. Modify quick\_annotations.conf as needed.  File provided is only an example.
+
+Config File
+-----------
+
+File is in perl syntax defined in <a href="https://metacpan.org/pod/Mojolicious::Plugin::Config">Mojolicious::Plugin::Config</a>.
+
+Config Keys Explained
+--------------------- 
+
+dbname = filename for SQLite database
+highlight\_terms = an array of words that will be highlighted when the text document is displayed
+annotations = an array of objects used to define each annotation
+
 
 Perl Modules Required
 ---------------------
