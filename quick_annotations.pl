@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
+
+use strict;
 use Mojolicious::Lite;
+use Mojo::JSON qw/encode_json decode_json/;
 use DBI;
-use Mojo::JSON qw/encode_json/;
 
 use constant ANNOTATION_STATUS_NOT_DONE => 0;
 use constant ANNOTATION_STATUS_DONE => 1;
@@ -124,6 +126,35 @@ helper store_annotation => sub {
      $sth->finish();
 };
 
+# retrieve all annotations and return as array ref, decode encoded JSON to perl hash
+helper export_all_annotations => sub {
+     my $c = shift;
+     my $dbh = $c->dbh;
+
+     my $export_all_sql = 'select * from annotations order by document_id';
+
+     my $sth = $dbh->prepare_cached($export_all_sql);
+
+     die "ERROR: $DBI::errstr" unless $sth;
+
+     $sth->execute();
+
+     my @all_records;
+
+     while(my $record = $sth->fetchrow_hashref('NAME_lc')) {
+         my $annotation = decode_json($record->{annotation});
+
+	 $record->{annotation} = $annotation;
+
+	 push @all_records, $record;
+     }
+
+     $sth->finish();
+
+     return \@all_records;
+};
+
+# present annotation form to user
 get '/' => sub {
   my $c = shift;
   
@@ -145,11 +176,13 @@ get '/' => sub {
   $c->render(template => 'index');
 };
 
+# tell user that all annotations are complete
 get '/done' => sub {
   my $c = shift;
   $c->render(template => 'done');
 };
 
+# store annotation for this document
 post '/annotate/:documentid' => sub {
    my $c = shift;
 
@@ -168,6 +201,15 @@ post '/annotate/:documentid' => sub {
    $c->store_annotation($document_id, $annotation_json);
 
    $c->redirect_to('/')
+};
+
+# export all annotation records
+get '/export' => sub {
+   my $c = shift;
+
+   my $export_records = $c->export_all_annotations();
+
+   $c->render(json => $export_records);
 };
 
 app->start;

@@ -19,10 +19,9 @@ File is in perl syntax defined in <a href="https://metacpan.org/pod/Mojolicious:
 Config Keys Explained
 --------------------- 
 
-dbname = filename for SQLite database
-highlight\_terms = an array of words that will be highlighted when the text document is displayed
-annotations = an array of objects used to define each annotation
-
+* dbname = filename for SQLite database
+* highlight\_terms = an array of words that will be highlighted when the text document is displayed
+* annotations = an array of objects used to define each annotation.  Each object will have a key for "name" and "value".
 
 Perl Modules Required
 ---------------------
@@ -35,3 +34,8 @@ Usage
 
 1. <code>perl quick\_annotations.pl daemon</code>
 2. Browse to http://localhost:3000
+
+Export Annotations
+==================
+
+1. Browse to http://localhost:3000/export
